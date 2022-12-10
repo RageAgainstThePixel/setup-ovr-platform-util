@@ -5,11 +5,12 @@ const path = require('path');
 const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
 const exec = require('@actions/exec');
+const ovrPlatformUtil = 'ovr-platform-util';
 
 const main = async () => {
     try {
         let osPlatform = os.platform();
-        let pathToCLI = tc.find('ovr-platform-util', '1.0.0');
+        let pathToCLI = tc.find(ovrPlatformUtil, '1.0.0');
 
         if (!pathToCLI) {
             let url = undefined;
@@ -22,22 +23,24 @@ const main = async () => {
                 url = 'https://www.oculus.com/download_app/?id=1076686279105243';
                 fileEx = '.exe';
             } else {
-                throw Error(`ovr-platform-util not available for ${osPlatform}`);
+                throw Error(`${ovrPlatformUtil} not available for ${osPlatform}`);
             }
 
-            core.info(`Attempting to download ovr-platform-util from ${url}`);
+            let fileName =  `${ovrPlatformUtil}${fileEx}`;
+            downloadPath = path.resolve(getTempDirectory(), fileName);
+
+            core.info(`Attempting to download ${ovrPlatformUtil} from ${url} to ${downloadPath}`);
 
             try {
-                downloadPath = await tc.downloadTool(url);
+                downloadPath = await tc.downloadTool(url, downloadPath);
             } catch (error) {
                 throw error;
             }
 
-            core.info(`Successfully downloaded ovr-platform-util to ${downloadPath}`);
+            core.info(`Successfully downloaded ${ovrPlatformUtil} to ${downloadPath}`);
 
-            let fileName =  `ovr-platform-util${fileEx}`;
-            core.info(`Setting tool cache ${downloadPath} | ${fileName} | ovr-platform-util`);
-            pathToCLI = await tc.cacheFile(downloadPath, fileName, 'ovr-platform-util', '1.0.0');
+            core.info(`Setting tool cache ${downloadPath} | ${fileName} | ${ovrPlatformUtil}`);
+            pathToCLI = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, '1.0.0');
             core.info(`pathToCLI: ${pathToCLI}`);
 
             const files = await readdir(pathToCLI);
@@ -56,10 +59,10 @@ const main = async () => {
         }
 
         core.addPath(pathToCLI);
-        core.exportVariable('ovr-platform-util', pathToCLI);
+        core.exportVariable(ovrPlatformUtil, pathToCLI);
 
-        exec.exec('ovr-platform-util', 'version');
-        exec.exec('ovr-platform-util', 'help');
+        exec.exec(ovrPlatformUtil, 'version');
+        exec.exec(ovrPlatformUtil, 'help');
     } catch (error) {
         core.setFailed(error);
     }
@@ -67,7 +70,7 @@ const main = async () => {
 
 main();
 
-function _getTempDirectory() {
+function getTempDirectory() {
     const tempDirectory = process.env['RUNNER_TEMP'] || ''
     return tempDirectory
 }

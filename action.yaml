@@ -1,5 +1,5 @@
-name: 'Meta Quest App Distribution'
-description: 'A GitHub Action for distribution of Meta Quest Apps to specified Channels'
+name: 'Setup OVR Platform Utility'
+description: 'A GitHub Action to setup the ovr platform utility tool'
 
 runs:
   using: 'node16'
