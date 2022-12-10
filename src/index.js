@@ -54,9 +54,15 @@ const main = async () => {
             };
 
             await exec.exec(downloadPath, 'version', options);
-            const semVerRegex = '^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?';
-            output = new RegExp(semVerRegex, output);
-            let downloadedVersion = semver.clean(output);
+            const semVerPattern = '^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?';
+            const semVerRegEx = new RegExp(semVerPattern);
+            const matches = semVerRegEx.match(output);
+            let downloadedVersion = semver.clean(matches[0]);
+
+            if (!downloadedVersion){
+                throw Error("Failed to find a valid version");
+            }
+
             core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadedVersion}`);
             pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadedVersion);
             pathToModule = getExecutable(pathToToolDir);
