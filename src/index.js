@@ -55,8 +55,8 @@ const main = async () => {
 
             await exec.exec(downloadPath, 'version', options);
             const semVerPattern = /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?/;
-            const semVerRegEx = new RegExp(semVerPattern);
-            const matches = output.match(semVerRegEx);
+            const matches = output.match(semVerPattern);
+            core.info(`matches: ${matches}`);
             let downloadedVersion = semver.clean(matches[0]);
 
             if (!downloadedVersion){
