@@ -6737,10 +6737,13 @@ const main = async () => {
 
             core.info(`Successfully downloaded ovr-platform-util to ${downloadPath}`);
 
-            let fileName =  `ovr-platform-util${fileEx}`;
-            targetFile = path.resolve(downloadPath,fileName);
+            exec.exec(`ls ${downloadPath}`);
 
-            if(!fs.statSync(targetFile).isFile()) {
+            let fileName =  `ovr-platform-util${fileEx}`;
+            targetFile = path.resolve(downloadPath, fileName);
+            let fsStat = fs.statSync(targetFile);
+
+            if (!fsStat.isFile()) {
                 throw Error(`failed to find ${fileName}`);
             }
 
