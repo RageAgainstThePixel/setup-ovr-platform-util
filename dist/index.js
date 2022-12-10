@@ -6766,7 +6766,9 @@ const main = async () => {
         }
 
         core.info(`pathToToolDir: ${pathToToolDir}`);
-        core.addPath(pathToToolDir);
+        core.info(`pathToModule: ${pathToModule}`);
+
+        core.addPath(pathToModule);
         core.exportVariable(ovrPlatformUtil, pathToModule);
 
         exec.exec(ovrPlatformUtil, 'version');
