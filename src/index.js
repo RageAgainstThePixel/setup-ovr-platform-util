@@ -46,10 +46,11 @@ const main = async () => {
             }
 
             let output = '';
-            const options = {};
-            options.listeners = {
-                stdout: (data) => {
-                    output += data.toString();
+            let options = {
+                listeners: {
+                    stdout: (data) => {
+                        output += data.toString();
+                    }
                 }
             }
 
