@@ -1,6 +1,5 @@
 const os = require('os');
-const fs = require('fs');
-const { readdir } = require('fs/promises');
+const semver = require('semver');
 const path = require('path');
 const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
@@ -41,15 +40,24 @@ const main = async () => {
             }
 
             core.info(`Successfully downloaded ${ovrPlatformUtil} to ${downloadPath}`);
-            core.info(`Setting tool cache ${downloadPath} | ${fileName} | ${ovrPlatformUtil}`);
 
-            pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, '1.0.0');
-            pathToModule = getExecutable(pathToToolDir);
-
-            if (osPlatform == 'darwin') {
-                core.info(`Change the access permissions of the utility for it to execute`);
-                await exec.exec(`chmod +x ${pathToModule}`);
+            if (IS_MAC) {
+                await exec.exec(`chmod +x ${downloadPath}`);
             }
+
+            let output = '';
+            const options = {};
+            options.listeners = {
+                stdout: (data) => {
+                    output += data.toString();
+                }
+            }
+
+            await exec.exec(downloadPath, 'version');
+            let downloadedVersion = semver.clean(output);
+            core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadedVersion}`);
+            pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadedVersion);
+            pathToModule = getExecutable(pathToToolDir);
         } else {
             pathToModule = getExecutable(pathToToolDir);
             await exec.exec(pathToModule, 'self-update');
@@ -58,7 +66,7 @@ const main = async () => {
         core.info(`pathToToolDir: ${pathToToolDir}`);
         core.info(`pathToModule: ${pathToModule}`);
 
-        core.addPath(pathToModule);
+        core.addPath(pathToToolDir);
         core.exportVariable(ovrPlatformUtil, pathToModule);
 
         await exec.exec(pathToModule, 'version');
