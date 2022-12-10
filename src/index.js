@@ -46,13 +46,12 @@ const main = async () => {
             }
 
             let output = '';
-            let options = {
-                listeners: {
-                    stdout: (data) => {
-                        output += data.toString();
-                    }
-                }
-            }
+            const options = {};
+            options.listeners = {
+              stdout: (data) => {
+                output += data.toString();
+              }
+            };
 
             await exec.exec(downloadPath, 'version', options);
             let downloadedVersion = semver.clean(output);
