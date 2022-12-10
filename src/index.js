@@ -56,7 +56,7 @@ const main = async () => {
             await exec.exec(downloadPath, 'version', options);
             const semVerPattern = /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?/;
             const semVerRegEx = new RegExp(semVerPattern);
-            const matches = semVerRegEx.match(output);
+            const matches = output.match(semVerRegEx);
             let downloadedVersion = semver.clean(matches[0]);
 
             if (!downloadedVersion){
@@ -95,4 +95,9 @@ function getExecutable(dir) {
     const fileEx = IS_WINDOWS ? '.exe' : '';
     const moduleName = `${ovrPlatformUtil}${fileEx}`;
     return path.resolve(dir, moduleName);
+}
+
+function getVersion() {
+    let version = '';
+    return version
 }
