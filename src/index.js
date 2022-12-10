@@ -1,5 +1,6 @@
 const os = require('os');
 const fs = require('fs');
+const { readdir } = require('fs/promises');
 const path = require('path');
 const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
