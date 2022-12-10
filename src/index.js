@@ -35,7 +35,11 @@ const main = async () => {
 
             core.info(`Successfully downloaded ovr-platform-util to ${downloadPath}`);
 
-            exec.exec(`ls ${downloadPath}`);
+            const files = await readdir(dir);
+
+            for (const file in files) {
+                core.info(file);
+            }
 
             let fileName =  `ovr-platform-util${fileEx}`;
             targetFile = path.resolve(downloadPath, fileName);
