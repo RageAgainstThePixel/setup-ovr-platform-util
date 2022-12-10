@@ -54,8 +54,8 @@ const main = async () => {
             };
 
             await exec.exec(downloadPath, 'version', options);
-            const semVerPattern = /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?/;
-            const matches = output.match(semVerPattern);
+            const semVerRegEx = new RegExp(/^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?/);
+            const matches = output.match(semVerRegEx);
             core.info(`matches: ${matches}`);
             let downloadedVersion = semver.clean(matches[0]);
 
@@ -97,7 +97,7 @@ function getExecutable(dir) {
     return path.resolve(dir, moduleName);
 }
 
-function getVersion() {
+function getVersion(module) {
     let version = '';
     return version
 }
