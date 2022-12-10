@@ -6724,7 +6724,7 @@ const main = async () => {
                 throw Error(`ovr-platform-util not available for ${osPlatform}`);
             }
 
-            core.info(`Attempting to download ovr-platform-util fro ${url}`);
+            core.info(`Attempting to download ovr-platform-util from ${url}`);
 
             try {
                 downloadPath = await tc.downloadTool(url);
@@ -6734,7 +6734,7 @@ const main = async () => {
 
             core.info(`Successfully downloaded ovr-platform-util to ${downloadPath}`);
 
-            targetFile = path.basename(downloadPath);
+            targetFile = path.resolve(downloadPath, 'ovr-platform-util');
             core.info(`Setting tool cache ${downloadPath} | ${targetFile} | ovr-platform-util`);
             pathToCLI = tc.cacheFile(downloadPath, targetFile, 'ovr-platform-util', '1.0.0');
 
