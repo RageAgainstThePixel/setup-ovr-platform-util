@@ -6739,7 +6739,7 @@ const main = async () => {
             core.info(`Attempting to download ovr-platform-util from ${url}`);
 
             try {
-                downloadPath = await tc.downloadTool(url);
+                downloadPath = await tc.downloadTool(url, path.resolve(_getTempDirectory(), 'ovr-platform-util'));
             } catch (error) {
                 throw error;
             }
@@ -6784,6 +6784,10 @@ const main = async () => {
 
 main();
 
+function _getTempDirectory() {
+    const tempDirectory = process.env['RUNNER_TEMP'] || ''
+    return tempDirectory
+}
 })();
 
 module.exports = __webpack_exports__;
