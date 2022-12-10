@@ -6739,29 +6739,16 @@ const main = async () => {
             core.info(`Attempting to download ovr-platform-util from ${url}`);
 
             try {
-                downloadPath = await tc.downloadTool(url, path.resolve(_getTempDirectory(), 'ovr-platform-util'));
+                downloadPath = await tc.downloadTool(url);
             } catch (error) {
                 throw error;
             }
 
             core.info(`Successfully downloaded ovr-platform-util to ${downloadPath}`);
 
-            const files = await readdir(downloadPath);
-
-            for (const file in files) {
-                core.info(file);
-            }
-
             let fileName =  `ovr-platform-util${fileEx}`;
-            targetFile = path.resolve(downloadPath, fileName);
-            let fsStat = fs.statSync(targetFile);
-
-            if (!fsStat.isFile()) {
-                throw Error(`failed to find ${fileName}`);
-            }
-
-            core.info(`Setting tool cache ${downloadPath} | ${targetFile} | ovr-platform-util`);
-            pathToCLI = await tc.cacheFile(downloadPath, targetFile, 'ovr-platform-util', '1.0.0');
+            core.info(`Setting tool cache ${downloadPath} | ${fileName} | ovr-platform-util`);
+            pathToCLI = await tc.cacheFile(downloadPath, fileName, 'ovr-platform-util', '1.0.0');
             core.info(`pathToCLI: ${pathToCLI}`);
 
             if (osPlatform == 'darwin') {
