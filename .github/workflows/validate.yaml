@@ -26,6 +26,8 @@ jobs:
       - name: checkout self
         uses: actions/checkout@v3
 
+      - uses: actions/setup-node@v3
+
       - name: RageAgainstThePixel/setup-ovr-platform-util
         uses: ./
 

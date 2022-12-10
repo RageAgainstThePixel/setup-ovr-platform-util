@@ -9,7 +9,6 @@ const exec = require('@actions/exec');
 const main = async () => {
     try {
         let osPlatform = os.platform();
-        let targetFile = undefined;
         let pathToCLI = tc.find('ovr-platform-util', '1.0.0');
 
         if (!pathToCLI) {
