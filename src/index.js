@@ -54,6 +54,7 @@ const main = async () => {
             };
 
             await exec.exec(downloadPath, 'version', options);
+            core.info(`output: ${output}`);
             let downloadedVersion = semver.clean(output);
             core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadedVersion}`);
             pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadedVersion);
