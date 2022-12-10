@@ -1,0 +1,6 @@
+name: 'Meta Quest App Distribution'
+description: 'A GitHub Action for distribution of Meta Quest Apps to specified Channels'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
