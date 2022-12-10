@@ -61,8 +61,8 @@ const main = async () => {
         core.addPath(pathToModule);
         core.exportVariable(ovrPlatformUtil, pathToModule);
 
-        exec.exec(ovrPlatformUtil, 'version');
-        exec.exec(ovrPlatformUtil, 'help');
+        exec.exec(pathToModule, 'version');
+        exec.exec(pathToModule, 'help');
     } catch (error) {
         core.setFailed(error);
     }
