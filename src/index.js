@@ -41,6 +41,13 @@ const main = async () => {
             pathToCLI = await tc.cacheFile(downloadPath, fileName, 'ovr-platform-util', '1.0.0');
             core.info(`pathToCLI: ${pathToCLI}`);
 
+            const files = await readdir(pathToCLI);
+
+            for (const file of files) {
+                const item = path.resolve(pathToCLI, file);
+                core.info(item);
+            }
+
             if (osPlatform == 'darwin') {
                 core.info(`Change the access permissions of the utility for it to execute`);
                 exec.exec(`chmod +x ${pathToCLI}`);
