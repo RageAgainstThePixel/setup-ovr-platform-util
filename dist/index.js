@@ -6746,7 +6746,7 @@ const main = async () => {
 
             core.info(`Successfully downloaded ovr-platform-util to ${downloadPath}`);
 
-            const files = await readdir(dir);
+            const files = await readdir(downloadPath);
 
             for (const file in files) {
                 core.info(file);
