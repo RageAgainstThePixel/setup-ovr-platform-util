@@ -25,7 +25,7 @@ const main = async () => {
             core.info(`Attempting to download ovr-platform-util fro ${url}`);
 
             try {
-                downloadPath = tc.downloadTool(url);
+                downloadPath = await tc.downloadTool(url);
             } catch (error) {
                 throw error;
             }
