@@ -1,4 +1,5 @@
 const os = require('os');
+const fs = require('fs');
 const path = require('path');
 const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
@@ -13,11 +14,13 @@ const main = async () => {
         if (!pathToCLI) {
             let url = undefined;
             let downloadPath = undefined;
+            let fileEx = '';
 
             if (osPlatform == 'darwin') {
                 url = 'https://www.oculus.com/download_app/?id=1462426033810370';
             } else if (osPlatform == 'win32') {
                 url = 'https://www.oculus.com/download_app/?id=1076686279105243';
+                fileEx = '.exe';
             } else {
                 throw Error(`ovr-platform-util not available for ${osPlatform}`);
             }
@@ -32,7 +35,13 @@ const main = async () => {
 
             core.info(`Successfully downloaded ovr-platform-util to ${downloadPath}`);
 
-            targetFile = path.resolve(downloadPath, 'ovr-platform-util');
+            let fileName =  `ovr-platform-util${fileEx}`;
+            targetFile = path.resolve(downloadPath,fileName);
+
+            if(!fs.statSync(targetFile).isFile()) {
+                throw Error(`failed to find ${fileName}`);
+            }
+
             core.info(`Setting tool cache ${downloadPath} | ${targetFile} | ovr-platform-util`);
             pathToCLI = await tc.cacheFile(downloadPath, targetFile, 'ovr-platform-util', '1.0.0');
             core.info(`pathToCLI: ${pathToCLI}`);
