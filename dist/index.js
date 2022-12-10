@@ -6758,11 +6758,11 @@ const main = async () => {
 
             if (osPlatform == 'darwin') {
                 core.info(`Change the access permissions of the utility for it to execute`);
-                exec.exec(`chmod +x ${pathToModule}`);
+                await exec.exec(`chmod +x ${pathToModule}`);
             }
         } else {
             pathToModule = getExecutable(pathToToolDir);
-            exec.exec(pathToModule, 'self-update');
+            await exec.exec(pathToModule, 'self-update');
         }
 
         core.info(`pathToToolDir: ${pathToToolDir}`);
@@ -6771,8 +6771,8 @@ const main = async () => {
         core.addPath(pathToModule);
         core.exportVariable(ovrPlatformUtil, pathToModule);
 
-        exec.exec(pathToModule, 'version');
-        exec.exec(pathToModule, 'help');
+        await exec.exec(pathToModule, 'version');
+        await exec.exec(pathToModule, 'help');
     } catch (error) {
         core.setFailed(error);
     }
