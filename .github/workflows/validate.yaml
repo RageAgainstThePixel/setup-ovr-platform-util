@@ -22,7 +22,11 @@ jobs:
         os: [ macos-latest, windows-latest ]
 
     steps:
-      - uses: ./
+      - name: checkout self
+        uses: actions/checkout@v3
+
+      - name: RageAgainstThePixel/setup-ovr-platform-util
+        uses: ./
 
       - run: 'ovr-platform-util version'
         shell: pwsh
