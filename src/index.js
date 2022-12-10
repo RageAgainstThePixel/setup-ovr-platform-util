@@ -54,7 +54,8 @@ const main = async () => {
             };
 
             await exec.exec(downloadPath, 'version', options);
-            core.info(`output: ${output}`);
+            const semVerRegex = '^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?';
+            output = new RegExp(semVerRegex, output);
             let downloadedVersion = semver.clean(output);
             core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadedVersion}`);
             pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadedVersion);
