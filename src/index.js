@@ -34,7 +34,7 @@ const main = async () => {
 
             targetFile = path.resolve(downloadPath, 'ovr-platform-util');
             core.info(`Setting tool cache ${downloadPath} | ${targetFile} | ovr-platform-util`);
-            pathToCLI = tc.cacheFile(downloadPath, targetFile, 'ovr-platform-util', '1.0.0');
+            pathToCLI = await tc.cacheFile(downloadPath, targetFile, 'ovr-platform-util', '1.0.0');
             core.info(`pathToCLI: ${pathToCLI}`);
 
             if (osPlatform == 'darwin') {
