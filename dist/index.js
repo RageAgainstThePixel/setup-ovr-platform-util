@@ -9943,13 +9943,15 @@ async function getVersion(module) {
         }
     });
 
-    const matches = output.match(semVerRegEx);
+    const match = output.match(semVerRegEx)[0];
 
-    if (!matches) {
+    if (!match) {
         throw Error("Failed to find a valid version match");
     }
 
-    const version = semver.clean(matches[0]);
+    const lastPeriodIndex = match.lastIndexOf('.');
+    const semVerStr = match.substring(0, lastPeriodIndex) + '+' + match.substring(lastPeriodIndex + 1);
+    const version = semver.clean(semVerStr);
 
     if (!version) {
         throw Error("Failed to find a valid version");
