@@ -1,6 +1,6 @@
 # Setup OVR Platform Util
 
-A GitHub Action to setup the ovr platform utility tool
+A GitHub Action to setup the [ovr platform utility tool](https://developer.oculus.com/resources/publish-reference-platform-command-line-utility/)
 
 ## How to use
 
