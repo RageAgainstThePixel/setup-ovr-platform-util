@@ -9895,7 +9895,7 @@ const main = async () => {
                 await exec.exec(`chmod +x ${downloadPath}`);
             }
 
-            const downloadVersion = getVersion(downloadPath);
+            const downloadVersion = await getVersion(downloadPath);
 
             core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadVersion}`);
             pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadVersion);
