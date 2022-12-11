@@ -1,0 +1,33 @@
+name: validate
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - '*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}
+
+jobs:
+  validate:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest, macos, windows ]
+
+    steps:
+      - name: checkout self
+        uses: actions/checkout@v3
+
+      - name: RageAgainstThePixel/setup-ovr-platform-util
+        uses: ./
+
+      - run: 'ovr-platform-util version'
+        shell: pwsh

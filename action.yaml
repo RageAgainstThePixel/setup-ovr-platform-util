@@ -1,0 +1,9 @@
+name: 'Setup OVR Platform Utility'
+description: 'A GitHub Action to setup the ovr platform utility tool'
+branding:
+  icon: 'box'
+  color: 'blue'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
