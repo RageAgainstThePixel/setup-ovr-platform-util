@@ -47,8 +47,7 @@ const main = async () => {
             }
 
             const downloadVersion = await getVersion(downloadPath);
-
-            core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadVersion}`);
+            core.debug(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadVersion}`);
             pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadVersion);
             pathToModule = getExecutable(pathToToolDir);
         } else {
@@ -56,13 +55,10 @@ const main = async () => {
             await exec.exec(pathToModule, 'self-update');
         }
 
-        core.info(`pathToToolDir: ${pathToToolDir}`);
-        core.info(`pathToModule: ${pathToModule}`);
-
+        core.debug(`${ovrPlatformUtil} -> ${pathToModule}`);
         core.addPath(pathToToolDir);
         core.exportVariable(ovrPlatformUtil, pathToModule);
 
-        await exec.exec(pathToModule, 'version');
         await exec.exec(pathToModule, 'help');
     } catch (error) {
         core.setFailed(error);
