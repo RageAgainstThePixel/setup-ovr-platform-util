@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-latest, windows-latest, self-hosted ]
+        os: [ macos-latest, windows-latest, macos, windows ]
 
     steps:
       - name: checkout self
