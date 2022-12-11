@@ -9863,7 +9863,7 @@ const main = async () => {
         const fileEx = IS_WINDOWS ? '.exe' : '';
         let osPlatform = os.platform();
         let pathToModule = undefined;
-        let version = core.getInput('version');
+        let version = core.getInput('version') || '1.0.0';
         let pathToToolDir = tc.find(ovrPlatformUtil, version);
 
         if (!pathToToolDir) {
