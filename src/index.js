@@ -14,7 +14,8 @@ const main = async () => {
         const fileEx = IS_WINDOWS ? '.exe' : '';
         let osPlatform = os.platform();
         let pathToModule = undefined;
-        let pathToToolDir = tc.find(ovrPlatformUtil, '1.0.0');
+        let version = core.getInput('version');
+        let pathToToolDir = tc.find(ovrPlatformUtil, version);
 
         if (!pathToToolDir) {
             let url = undefined;
@@ -31,7 +32,7 @@ const main = async () => {
             let fileName =  `${ovrPlatformUtil}${fileEx}`;
             downloadPath = path.resolve(getTempDirectory(), fileName);
 
-            core.info(`Attempting to download ${ovrPlatformUtil} from ${url} to ${downloadPath}`);
+            core.debug(`Attempting to download ${ovrPlatformUtil} from ${url} to ${downloadPath}`);
 
             try {
                 downloadPath = await tc.downloadTool(url, downloadPath);
@@ -39,32 +40,16 @@ const main = async () => {
                 throw error;
             }
 
-            core.info(`Successfully downloaded ${ovrPlatformUtil} to ${downloadPath}`);
+            core.debug(`Successfully downloaded ${ovrPlatformUtil} to ${downloadPath}`);
 
             if (IS_MAC) {
                 await exec.exec(`chmod +x ${downloadPath}`);
             }
 
-            let output = '';
-            const options = {};
-            options.listeners = {
-              stdout: (data) => {
-                output += data.toString();
-              }
-            };
+            const downloadVersion = getVersion(downloadPath);
 
-            await exec.exec(downloadPath, 'version', options);
-            const semVerRegEx = new RegExp(/([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?/);
-            const matches = output.match(semVerRegEx);
-            core.info(`matches: ${matches}`);
-            let downloadedVersion = semver.clean(matches[0]);
-
-            if (!downloadedVersion) {
-                throw Error("Failed to find a valid version");
-            }
-
-            core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadedVersion}`);
-            pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadedVersion);
+            core.info(`Setting tool cache: ${downloadPath} | ${fileName} | ${ovrPlatformUtil} | ${downloadVersion}`);
+            pathToToolDir = await tc.cacheFile(downloadPath, fileName, ovrPlatformUtil, downloadVersion);
             pathToModule = getExecutable(pathToToolDir);
         } else {
             pathToModule = getExecutable(pathToToolDir);
@@ -97,7 +82,29 @@ function getExecutable(dir) {
     return path.resolve(dir, moduleName);
 }
 
-function getVersion(module) {
-    let version = '';
+async function getVersion(module) {
+    const semVerRegEx = new RegExp(/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)?/);
+    let output = '';
+
+    await exec.exec(module, 'version', {
+        listeners: {
+          stdout: (data) => {
+            output += data.toString();
+          }
+        }
+    });
+
+    const matches = output.match(semVerRegEx);
+
+    if (!matches) {
+        throw Error("Failed to find a valid version match");
+    }
+
+    const version = semver.clean(matches[0]);
+
+    if (!version) {
+        throw Error("Failed to find a valid version");
+    }
+
     return version
 }
