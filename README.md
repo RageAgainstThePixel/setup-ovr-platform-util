@@ -14,7 +14,7 @@ jobs:
 
     steps:
         # download and setup ovr platform util
-      - uses: RageAgainstThePixel/setup-ovr-platform-util@v1
+      - uses: RageAgainstThePixel/setup-ovr-platform-util@v1.1
 
         # run commands
       - run: 'ovr-platform-util version'
