@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: checkout self
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: RageAgainstThePixel/setup-ovr-platform-util
         uses: ./
