@@ -14,7 +14,7 @@ const main = async () => {
         const fileEx = IS_WINDOWS ? '.exe' : '';
         let osPlatform = os.platform();
         let pathToModule = undefined;
-        let pathToToolDir = tc.find(ovrPlatformUtil, '1.96.0');
+        let pathToToolDir = tc.find(ovrPlatformUtil, '1.98.0');
 
         if (!pathToToolDir) {
             let url = undefined;
@@ -28,7 +28,7 @@ const main = async () => {
                 throw Error(`${ovrPlatformUtil} not available for ${osPlatform}`);
             }
 
-            let fileName =  `${ovrPlatformUtil}${fileEx}`;
+            let fileName = `${ovrPlatformUtil}${fileEx}`;
             downloadPath = path.resolve(getTempDirectory(), fileName);
 
             core.debug(`Attempting to download ${ovrPlatformUtil} from ${url} to ${downloadPath}`);
@@ -83,9 +83,9 @@ async function getVersion(module) {
 
     await exec.exec(module, 'version', {
         listeners: {
-          stdout: (data) => {
-            output += data.toString();
-          }
+            stdout: (data) => {
+                output += data.toString();
+            }
         }
     });
 
