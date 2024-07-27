@@ -1,4 +1,4 @@
-# Setup OVR Platform Util
+# setup-ovr-platform-utility
 
 A GitHub Action to setup the [`ovr-platform-utility`](https://developer.oculus.com/resources/publish-reference-platform-command-line-utility/) tool command alias.
 
