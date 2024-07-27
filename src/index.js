@@ -42,7 +42,7 @@ async function setup_ovrPlatformUtil() {
         tool = getExecutable(toolDirectory);
         fs.access(tool);
         core.debug(`Found ${tool} in ${toolDirectory}`);
-        await exec.exec(ovrPlatformUtil, 'self-update');
+        await exec.exec(tool, 'self-update');
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`)
     core.addPath(toolDirectory);
