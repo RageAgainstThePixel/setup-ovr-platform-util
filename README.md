@@ -17,7 +17,6 @@ jobs:
       - uses: RageAgainstThePixel/setup-ovr-platform-util@v1
         # run commands
       - run: 'ovr-platform-util version'
-        shell: pwsh
 ```
 
 ## Related actions

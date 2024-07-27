@@ -30,4 +30,3 @@ jobs:
         uses: ./
 
       - run: 'ovr-platform-util version'
-        shell: pwsh
