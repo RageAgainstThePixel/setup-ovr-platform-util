@@ -1,6 +1,6 @@
 # setup-ovr-platform-utility
 
-A GitHub Action to setup the [`ovr-platform-utility`](https://developer.oculus.com/resources/publish-reference-platform-command-line-utility/) tool command alias.
+A GitHub Action to setup the [`ovr-platform-utility`](https://developer.oculus.com/resources/publish-reference-platform-command-line-utility) tool command alias.
 
 ## How to use
 
@@ -11,7 +11,6 @@ jobs:
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, macos, windows ]
-
     steps:
         # download and setup ovr platform util
       - uses: RageAgainstThePixel/setup-ovr-platform-util@v1

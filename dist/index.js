@@ -34015,7 +34015,7 @@ function getTempDirectory() {
 }
 
 function getExecutable(directory) {
-    return path.resolve(directory, toolPath);
+    return path.join(directory, toolPath);
 }
 
 async function getVersion(tool) {
