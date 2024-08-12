@@ -1,16 +1,15 @@
 name: validate
-
 on:
+  schedule:
+    - cron: '0 0 * * 0' # every Sunday at midnight
   push:
     branches:
       - 'main'
   pull_request:
     branches:
       - '*'
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 concurrency:
   group: ${{ github.ref }}
 
@@ -21,12 +20,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-latest, windows-latest, macos, windows ]
-
     steps:
-      - name: checkout self
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: RageAgainstThePixel/setup-ovr-platform-util
         uses: ./
-
       - run: 'ovr-platform-util version'

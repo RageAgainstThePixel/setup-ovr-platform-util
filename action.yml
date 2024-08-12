@@ -1,9 +1,8 @@
 name: 'Setup OVR Platform Utility'
-description: 'A GitHub Action to setup the ovr platform utility tool'
+description: 'A GitHub Action to setup the ovr-platform-util tool command alias.'
 branding:
-  icon: 'box'
+  icon: 'terminal'
   color: 'blue'
-
 runs:
   using: 'node20'
   main: 'dist/index.js'
