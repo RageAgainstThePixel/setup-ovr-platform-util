@@ -33946,32 +33946,33 @@ module.exports = parseParams
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tc = __nccwpck_require__(7784);
+const core = __nccwpck_require__(2186);
+const exec = __nccwpck_require__(1514);
 const semver = __nccwpck_require__(1383);
 const path = __nccwpck_require__(1017);
-const core = __nccwpck_require__(2186);
-const tc = __nccwpck_require__(7784);
-const exec = __nccwpck_require__(1514);
-const fs = (__nccwpck_require__(7147).promises);
-
+const fs = __nccwpck_require__(7147);
 const ovrPlatformUtil = 'ovr-platform-util';
-const IS_WINDOWS = process.platform === 'win32'
-const IS_MAC = process.platform === 'darwin'
+const IS_WINDOWS = process.platform === 'win32';
+const IS_MAC = process.platform === 'darwin';
 const toolExtension = IS_WINDOWS ? '.exe' : '';
 const toolPath = `${ovrPlatformUtil}${toolExtension}`;
-
 const main = async () => {
     try {
         core.info(`Setting up ${ovrPlatformUtil}...`);
         await setup_ovrPlatformUtil();
-    } catch (error) {
+    }
+    catch (error) {
         core.setFailed(error);
     }
-}
-
+};
 main();
-
 async function setup_ovrPlatformUtil() {
     let toolDirectory = tc.find(ovrPlatformUtil, '*');
     let tool = undefined;
@@ -33988,41 +33989,39 @@ async function setup_ovrPlatformUtil() {
         core.debug(`Setting tool cache: ${archivePath} | ${toolPath} | ${ovrPlatformUtil} | ${downloadVersion}`);
         toolDirectory = await tc.cacheFile(archivePath, toolPath, ovrPlatformUtil, downloadVersion);
         tool = getExecutable(toolDirectory);
-    } else {
-        tool = getExecutable(toolDirectory);
-        fs.access(tool);
-        core.debug(`Found ${tool} in ${toolDirectory}`);
-        await exec.exec(tool, 'self-update');
     }
-    core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`)
+    else {
+        tool = getExecutable(toolDirectory);
+        fs.promises.access(tool);
+        core.debug(`Found ${tool} in ${toolDirectory}`);
+        await exec.exec(tool, ['self-update']);
+    }
+    core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`);
     core.addPath(toolDirectory);
-    await exec.exec(ovrPlatformUtil, 'help');
+    await exec.exec(ovrPlatformUtil, ['help']);
 }
-
 function getDownloadUrl() {
     if (IS_MAC) {
         return 'https://www.oculus.com/download_app/?id=1462426033810370';
-    } else if (IS_WINDOWS) {
+    }
+    else if (IS_WINDOWS) {
         return 'https://www.oculus.com/download_app/?id=1076686279105243';
-    } else {
+    }
+    else {
         throw Error(`${ovrPlatformUtil} not available for ${process.platform}`);
     }
 }
-
 function getTempDirectory() {
-    const tempDirectory = process.env['RUNNER_TEMP'] || ''
-    return tempDirectory
+    const tempDirectory = process.env['RUNNER_TEMP'] || '';
+    return tempDirectory;
 }
-
 function getExecutable(directory) {
     return path.join(directory, toolPath);
 }
-
 async function getVersion(tool) {
     const semVerRegEx = new RegExp(/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)?/);
     let output = '';
-
-    await exec.exec(tool, 'version', {
+    await exec.exec(tool, ['version'], {
         listeners: {
             stdout: (data) => {
                 output += data.toString();
@@ -34039,7 +34038,7 @@ async function getVersion(tool) {
     if (!version) {
         throw Error("Failed to find a valid version");
     }
-    return version
+    return version;
 }
 
 })();

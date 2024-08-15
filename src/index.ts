@@ -1,9 +1,9 @@
-const semver = require('semver');
-const path = require('path');
-const core = require('@actions/core');
-const tc = require('@actions/tool-cache');
-const exec = require('@actions/exec');
-const fs = require('fs').promises;
+import tc = require('@actions/tool-cache');
+import core = require('@actions/core');
+import exec = require('@actions/exec');
+import semver = require('semver');
+import path = require('path');
+import fs = require('fs');
 
 const ovrPlatformUtil = 'ovr-platform-util';
 const IS_WINDOWS = process.platform === 'win32'
@@ -22,7 +22,7 @@ const main = async () => {
 
 main();
 
-async function setup_ovrPlatformUtil() {
+async function setup_ovrPlatformUtil(): Promise<void> {
     let toolDirectory = tc.find(ovrPlatformUtil, '*');
     let tool = undefined;
     if (!toolDirectory) {
@@ -40,16 +40,16 @@ async function setup_ovrPlatformUtil() {
         tool = getExecutable(toolDirectory);
     } else {
         tool = getExecutable(toolDirectory);
-        fs.access(tool);
+        fs.promises.access(tool);
         core.debug(`Found ${tool} in ${toolDirectory}`);
-        await exec.exec(tool, 'self-update');
+        await exec.exec(tool, ['self-update']);
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`)
     core.addPath(toolDirectory);
-    await exec.exec(ovrPlatformUtil, 'help');
+    await exec.exec(ovrPlatformUtil, ['help']);
 }
 
-function getDownloadUrl() {
+function getDownloadUrl(): string {
     if (IS_MAC) {
         return 'https://www.oculus.com/download_app/?id=1462426033810370';
     } else if (IS_WINDOWS) {
@@ -59,7 +59,7 @@ function getDownloadUrl() {
     }
 }
 
-function getTempDirectory() {
+function getTempDirectory(): string {
     const tempDirectory = process.env['RUNNER_TEMP'] || ''
     return tempDirectory
 }
@@ -68,11 +68,11 @@ function getExecutable(directory) {
     return path.join(directory, toolPath);
 }
 
-async function getVersion(tool) {
+async function getVersion(tool: string): Promise<string> {
     const semVerRegEx = new RegExp(/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)?/);
     let output = '';
 
-    await exec.exec(tool, 'version', {
+    await exec.exec(tool, ['version'], {
         listeners: {
             stdout: (data) => {
                 output += data.toString();
