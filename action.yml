@@ -3,6 +3,11 @@ description: 'A GitHub Action to setup the ovr-platform-util tool command alias.
 branding:
   icon: 'terminal'
   color: 'blue'
+inputs:
+  self-update:
+    description: 'Automatically perform self update of ovr-platform-util tool.'
+    required: false
+    default: 'true'
 runs:
   using: 'node20'
   main: 'dist/index.js'
