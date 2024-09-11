@@ -33995,13 +33995,27 @@ async function setup_ovrPlatformUtil() {
         const selfUpdate = (core.getInput('self-update') || 'true') === 'true';
         if (selfUpdate) {
             await exec.exec(tool, ['self-update']);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await fs.promises.access(tool, fs.constants.X_OK);
+            await checkToolAccess(tool);
         }
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`);
     core.addPath(toolDirectory);
     await exec.exec(ovrPlatformUtil, ['help']);
+}
+async function checkToolAccess(tool, retries = 5) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        await fs.promises.access(tool, fs.constants.X_OK);
+    }
+    catch (error) {
+        if (error.code === 'EBUSY') {
+            core.warning(`Failed to access ${tool}, retrying...`);
+            await checkToolAccess(tool, retries - 1);
+        }
+        else {
+            throw error;
+        }
+    }
 }
 function getDownloadUrl() {
     if (IS_MAC) {
