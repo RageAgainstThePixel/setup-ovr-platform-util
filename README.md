@@ -18,6 +18,12 @@ jobs:
       - run: 'ovr-platform-util version'
 ```
 
+### inputs
+
+| Name | Description | Required |
+| ---- | ----------- | -------- |
+| `self-update` | Automatically update the ovr-platform-util tool. | Defaults to `true`. |
+
 ## Related actions
 
 - [upload-meta-quest-build](https://github.com/RageAgainstThePixel/upload-meta-quest-build)

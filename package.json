@@ -1,6 +1,6 @@
 {
   "name": "setup-ovr-platform-util",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A GitHub Action to setup the ovr-platform-util tool command alias.",
   "author": "RageAgainstThePixel",
   "repository": {
