@@ -24,7 +24,12 @@ const main = async () => {
 main();
 
 async function setup_ovrPlatformUtil(): Promise<void> {
-    let toolDirectory = tc.find(ovrPlatformUtil, '*');
+    let toolDirectory = undefined;
+    try {
+        toolDirectory = tc.find(ovrPlatformUtil, '*');
+    } catch (error) {
+        core.debug(`Failed to find ${ovrPlatformUtil} in cache: ${error.message}`);
+    }
     let tool = undefined;
     if (!toolDirectory) {
         const url = getDownloadUrl();
