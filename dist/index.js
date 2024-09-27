@@ -33989,7 +33989,7 @@ async function setup_ovrPlatformUtil() {
         core.debug(`Attempting to download ${ovrPlatformUtil} from ${url} to ${archiveDownloadPath}`);
         const archivePath = await tc.downloadTool(url, archiveDownloadPath);
         core.debug(`Successfully downloaded ${ovrPlatformUtil} to ${archivePath}`);
-        if (IS_MAC) {
+        if (IS_MAC || IS_LINUX) {
             await exec.exec(`chmod +x ${archivePath}`);
         }
         const downloadVersion = await getVersion(archivePath);
