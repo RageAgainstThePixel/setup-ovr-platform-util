@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest, macos, windows ]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
         # download and setup ovr platform util
       - uses: RageAgainstThePixel/setup-ovr-platform-util@v1

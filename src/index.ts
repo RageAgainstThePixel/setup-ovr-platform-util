@@ -8,6 +8,7 @@ import fs = require('fs');
 const ovrPlatformUtil = 'ovr-platform-util';
 const IS_WINDOWS = process.platform === 'win32'
 const IS_MAC = process.platform === 'darwin'
+const IS_LINUX = process.platform === 'linux'
 const toolExtension = IS_WINDOWS ? '.exe' : '';
 const toolPath = `${ovrPlatformUtil}${toolExtension}`;
 
@@ -70,14 +71,15 @@ function getDownloadUrl(): string {
         return 'https://www.oculus.com/download_app/?id=1462426033810370';
     } else if (IS_WINDOWS) {
         return 'https://www.oculus.com/download_app/?id=1076686279105243';
+    } else if (IS_LINUX) {
+        return 'https://www.oculus.com/download_app/?id=5159709737372459';
     } else {
         throw Error(`${ovrPlatformUtil} not available for ${process.platform}`);
     }
 }
 
 function getTempDirectory(): string {
-    const tempDirectory = process.env['RUNNER_TEMP'] || ''
-    return tempDirectory
+    return process.env['RUNNER_TEMP'] || ''
 }
 
 async function getExecutable(directory: string): Promise<string> {
@@ -90,7 +92,6 @@ async function getExecutable(directory: string): Promise<string> {
 async function getVersion(tool: string): Promise<string> {
     const semVerRegEx = new RegExp(/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)?/);
     let output = '';
-
     await exec.exec(tool, ['version'], {
         listeners: {
             stdout: (data) => {

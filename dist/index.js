@@ -33961,6 +33961,7 @@ const fs = __nccwpck_require__(7147);
 const ovrPlatformUtil = 'ovr-platform-util';
 const IS_WINDOWS = process.platform === 'win32';
 const IS_MAC = process.platform === 'darwin';
+const IS_LINUX = process.platform === 'linux';
 const toolExtension = IS_WINDOWS ? '.exe' : '';
 const toolPath = `${ovrPlatformUtil}${toolExtension}`;
 const main = async () => {
@@ -34024,13 +34025,15 @@ function getDownloadUrl() {
     else if (IS_WINDOWS) {
         return 'https://www.oculus.com/download_app/?id=1076686279105243';
     }
+    else if (IS_LINUX) {
+        return 'https://www.oculus.com/download_app/?id=5159709737372459';
+    }
     else {
         throw Error(`${ovrPlatformUtil} not available for ${process.platform}`);
     }
 }
 function getTempDirectory() {
-    const tempDirectory = process.env['RUNNER_TEMP'] || '';
-    return tempDirectory;
+    return process.env['RUNNER_TEMP'] || '';
 }
 async function getExecutable(directory) {
     const tool = path.join(directory, toolPath);
