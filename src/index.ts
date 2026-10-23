@@ -2,7 +2,6 @@ import tc = require('@actions/tool-cache');
 import core = require('@actions/core');
 import exec = require('@actions/exec');
 import io = require('@actions/io');
-import semver = require('semver');
 import version = require('./version');
 import path = require('path');
 import fs = require('fs');
@@ -29,7 +28,11 @@ main();
 async function setup_ovrPlatformUtil(): Promise<void> {
     let toolDirectory = undefined;
     try {
-        toolDirectory = tc.find(ovrPlatformUtil, '*');
+        // tc.find(name, '*') skips prereleases, which is how builds are cached
+        const latest = version.LatestCacheVersion(tc.findAllVersions(ovrPlatformUtil));
+        if (latest) {
+            toolDirectory = tc.find(ovrPlatformUtil, latest);
+        }
     } catch (error) {
         core.debug(`Failed to find ${ovrPlatformUtil} in cache: ${error.message}`);
     }
@@ -45,7 +48,7 @@ async function setup_ovrPlatformUtil(): Promise<void> {
         }
         const downloadVersion = await getVersion(archivePath);
         core.debug(`Setting tool cache: ${archivePath} | ${toolPath} | ${ovrPlatformUtil} | ${downloadVersion}`);
-        toolDirectory = await tc.cacheFile(archivePath, toolPath, ovrPlatformUtil, downloadVersion);
+        toolDirectory = await tc.cacheFile(archivePath, toolPath, ovrPlatformUtil, version.CacheVersion(downloadVersion));
         await fs.promises.rm(path.dirname(archivePath), { recursive: true, force: true });
         tool = await getExecutable(toolDirectory);
     } else {
@@ -60,11 +63,11 @@ async function setup_ovrPlatformUtil(): Promise<void> {
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`)
     core.addPath(toolDirectory);
-    const version = await getVersion(tool);
+    const toolVersion = await getVersion(tool);
     core.info(`OVR_PLATFORM_UTIL_PATH -> ${tool}`);
     core.exportVariable('OVR_PLATFORM_UTIL_PATH', tool);
     core.setOutput('path', tool);
-    core.setOutput('version', version);
+    core.setOutput('version', toolVersion);
     await exec.exec(ovrPlatformUtil, ['help']);
 }
 
@@ -73,11 +76,12 @@ async function recacheIfUpdated(tool: string, toolDirectory: string): Promise<st
     const versionDirectory = path.dirname(toolDirectory);
     const cachedVersion = path.basename(versionDirectory);
     const updatedVersion = await getVersion(tool);
-    if (semver.clean(updatedVersion) === cachedVersion) {
+    const updatedCacheVersion = version.CacheVersion(updatedVersion);
+    if (updatedCacheVersion === cachedVersion) {
         return toolDirectory;
     }
     core.info(`${ovrPlatformUtil} updated from ${cachedVersion} to ${updatedVersion}`);
-    const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedVersion);
+    const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedCacheVersion);
     await io.rmRF(versionDirectory);
     await io.rmRF(`${versionDirectory}.complete`);
     return updatedToolDirectory;

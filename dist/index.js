@@ -37109,6 +37109,8 @@ module.exports = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ParseVersion = ParseVersion;
+exports.CacheVersion = CacheVersion;
+exports.LatestCacheVersion = LatestCacheVersion;
 const semver = __nccwpck_require__(1383);
 const versionRegEx = /(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?/;
 function ParseVersion(output) {
@@ -37123,6 +37125,12 @@ function ParseVersion(output) {
         throw Error(`Failed to find a valid version in: ${match[0]}`);
     }
     return semVerStr;
+}
+function CacheVersion(version) {
+    return version.replace('+', '-');
+}
+function LatestCacheVersion(versions) {
+    return [...versions].sort(semver.rcompare)[0];
 }
 
 
@@ -37457,7 +37465,6 @@ const tc = __nccwpck_require__(7784);
 const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const io = __nccwpck_require__(7436);
-const semver = __nccwpck_require__(1383);
 const version = __nccwpck_require__(1946);
 const path = __nccwpck_require__(1017);
 const fs = __nccwpck_require__(7147);
@@ -37481,7 +37488,10 @@ main();
 async function setup_ovrPlatformUtil() {
     let toolDirectory = undefined;
     try {
-        toolDirectory = tc.find(ovrPlatformUtil, '*');
+        const latest = version.LatestCacheVersion(tc.findAllVersions(ovrPlatformUtil));
+        if (latest) {
+            toolDirectory = tc.find(ovrPlatformUtil, latest);
+        }
     }
     catch (error) {
         core.debug(`Failed to find ${ovrPlatformUtil} in cache: ${error.message}`);
@@ -37498,7 +37508,7 @@ async function setup_ovrPlatformUtil() {
         }
         const downloadVersion = await getVersion(archivePath);
         core.debug(`Setting tool cache: ${archivePath} | ${toolPath} | ${ovrPlatformUtil} | ${downloadVersion}`);
-        toolDirectory = await tc.cacheFile(archivePath, toolPath, ovrPlatformUtil, downloadVersion);
+        toolDirectory = await tc.cacheFile(archivePath, toolPath, ovrPlatformUtil, version.CacheVersion(downloadVersion));
         await fs.promises.rm(path.dirname(archivePath), { recursive: true, force: true });
         tool = await getExecutable(toolDirectory);
     }
@@ -37514,22 +37524,23 @@ async function setup_ovrPlatformUtil() {
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`);
     core.addPath(toolDirectory);
-    const version = await getVersion(tool);
+    const toolVersion = await getVersion(tool);
     core.info(`OVR_PLATFORM_UTIL_PATH -> ${tool}`);
     core.exportVariable('OVR_PLATFORM_UTIL_PATH', tool);
     core.setOutput('path', tool);
-    core.setOutput('version', version);
+    core.setOutput('version', toolVersion);
     await exec.exec(ovrPlatformUtil, ['help']);
 }
 async function recacheIfUpdated(tool, toolDirectory) {
     const versionDirectory = path.dirname(toolDirectory);
     const cachedVersion = path.basename(versionDirectory);
     const updatedVersion = await getVersion(tool);
-    if (semver.clean(updatedVersion) === cachedVersion) {
+    const updatedCacheVersion = version.CacheVersion(updatedVersion);
+    if (updatedCacheVersion === cachedVersion) {
         return toolDirectory;
     }
     core.info(`${ovrPlatformUtil} updated from ${cachedVersion} to ${updatedVersion}`);
-    const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedVersion);
+    const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedCacheVersion);
     await io.rmRF(versionDirectory);
     await io.rmRF(`${versionDirectory}.complete`);
     return updatedToolDirectory;

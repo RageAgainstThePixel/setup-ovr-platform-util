@@ -19,3 +19,19 @@ export function ParseVersion(output: string): string {
     }
     return semVerStr;
 }
+
+/**
+ * Tool cache key for a parsed version. The tool cache runs semver.clean(),
+ * which drops build metadata, so a.b.c+d is stored as the prerelease a.b.c-d
+ * to keep builds distinct.
+ */
+export function CacheVersion(version: string): string {
+    return version.replace('+', '-');
+}
+
+/**
+ * Picks the newest cache key from a list of cached versions.
+ */
+export function LatestCacheVersion(versions: string[]): string | undefined {
+    return [...versions].sort(semver.rcompare)[0];
+}
