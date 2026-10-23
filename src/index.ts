@@ -1,7 +1,9 @@
 import tc = require('@actions/tool-cache');
 import core = require('@actions/core');
 import exec = require('@actions/exec');
+import io = require('@actions/io');
 import semver = require('semver');
+import version = require('./version');
 import path = require('path');
 import fs = require('fs');
 
@@ -50,11 +52,28 @@ async function setup_ovrPlatformUtil(): Promise<void> {
         if (selfUpdate) {
             await exec.exec(tool, ['self-update']);
             await checkToolAccess(tool);
+            toolDirectory = await recacheIfUpdated(tool, toolDirectory);
+            tool = await getExecutable(toolDirectory);
         }
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`)
     core.addPath(toolDirectory);
     await exec.exec(ovrPlatformUtil, ['help']);
+}
+
+async function recacheIfUpdated(tool: string, toolDirectory: string): Promise<string> {
+    // toolDirectory is <tool-cache>/<name>/<version>/<arch>
+    const versionDirectory = path.dirname(toolDirectory);
+    const cachedVersion = path.basename(versionDirectory);
+    const updatedVersion = await getVersion(tool);
+    if (semver.clean(updatedVersion) === cachedVersion) {
+        return toolDirectory;
+    }
+    core.info(`${ovrPlatformUtil} updated from ${cachedVersion} to ${updatedVersion}`);
+    const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedVersion);
+    await io.rmRF(versionDirectory);
+    await io.rmRF(`${versionDirectory}.complete`);
+    return updatedToolDirectory;
 }
 
 async function checkToolAccess(tool: string, retries = 5): Promise<void> {
@@ -63,6 +82,9 @@ async function checkToolAccess(tool: string, retries = 5): Promise<void> {
         await fs.promises.access(tool, fs.constants.X_OK);
     } catch (error) {
         if (error.code === 'EBUSY') {
+            if (retries <= 0) {
+                throw Error(`Failed to access ${tool}, it is still busy after self-update`);
+            }
             core.warning(`Failed to access ${tool}, retrying...`);
             await checkToolAccess(tool, retries - 1);
         } else {
@@ -95,7 +117,6 @@ async function getExecutable(directory: string): Promise<string> {
 }
 
 async function getVersion(tool: string): Promise<string> {
-    const semVerRegEx = new RegExp(/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)?/);
     let output = '';
     await exec.exec(tool, ['version'], {
         listeners: {
@@ -104,15 +125,5 @@ async function getVersion(tool: string): Promise<string> {
             }
         }
     });
-    const match = output.match(semVerRegEx)[0];
-    if (!match) {
-        throw Error("Failed to find a valid version match");
-    }
-    const lastPeriodIndex = match.lastIndexOf('.');
-    const semVerStr = match.substring(0, lastPeriodIndex) + '+' + match.substring(lastPeriodIndex + 1);
-    const version = semver.clean(semVerStr);
-    if (!version) {
-        throw Error("Failed to find a valid version");
-    }
-    return version
+    return version.ParseVersion(output);
 }
