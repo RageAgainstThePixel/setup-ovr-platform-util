@@ -12,6 +12,17 @@ concurrency:
   group: ${{ github.ref }}
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm test
   validate:
     runs-on: ${{ matrix.os }}
     permissions:
@@ -19,9 +30,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest, macos, windows]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v6
       - name: RageAgainstThePixel/setup-ovr-platform-util
+        id: setup-ovr-platform-util
         uses: ./
       - run: 'ovr-platform-util version'
+      - run: |
+          echo "path: ${{ steps.setup-ovr-platform-util.outputs.path }}"
+          echo "version: ${{ steps.setup-ovr-platform-util.outputs.version }}"
+          "$OVR_PLATFORM_UTIL_PATH" version
+        shell: bash

@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
         # download and setup ovr platform util
-      - uses: RageAgainstThePixel/setup-ovr-platform-util@v1
+      - uses: RageAgainstThePixel/setup-ovr-platform-util@v2
         # run commands
       - run: 'ovr-platform-util version'
 ```
@@ -23,6 +23,15 @@ jobs:
 | Name | Description | Required |
 | ---- | ----------- | -------- |
 | `self-update` | Automatically update the ovr-platform-util tool. | Defaults to `true`. |
+
+### outputs
+
+- `path`: The full path to the ovr-platform-util executable.
+- `version`: The installed ovr-platform-util version.
+
+### environment variables
+
+- `OVR_PLATFORM_UTIL_PATH`: The full path to the ovr-platform-util executable.
 
 ## Related actions
 
