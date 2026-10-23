@@ -34,5 +34,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: RageAgainstThePixel/setup-ovr-platform-util
+        id: setup-ovr-platform-util
         uses: ./
       - run: 'ovr-platform-util version'
+      - run: |
+          echo "path: ${{ steps.setup-ovr-platform-util.outputs.path }}"
+          echo "version: ${{ steps.setup-ovr-platform-util.outputs.version }}"
+          "$OVR_PLATFORM_UTIL_PATH" version
+        shell: bash

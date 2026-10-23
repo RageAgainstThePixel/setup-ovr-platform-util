@@ -8,6 +8,11 @@ inputs:
     description: 'Automatically perform self update of ovr-platform-util tool.'
     required: false
     default: 'true'
+outputs:
+  path:
+    description: 'The full path to the ovr-platform-util executable.'
+  version:
+    description: 'The installed ovr-platform-util version.'
 runs:
   using: 'node24'
   main: 'dist/index.js'

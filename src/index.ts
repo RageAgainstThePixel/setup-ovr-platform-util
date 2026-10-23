@@ -6,6 +6,7 @@ import semver = require('semver');
 import version = require('./version');
 import path = require('path');
 import fs = require('fs');
+import crypto = require('crypto');
 
 const ovrPlatformUtil = 'ovr-platform-util';
 const IS_WINDOWS = process.platform === 'win32'
@@ -35,16 +36,17 @@ async function setup_ovrPlatformUtil(): Promise<void> {
     let tool = undefined;
     if (!toolDirectory) {
         const url = getDownloadUrl();
-        const archiveDownloadPath = path.resolve(getTempDirectory(), toolPath);
+        const archiveDownloadPath = path.resolve(getTempDirectory(), `${ovrPlatformUtil}-${crypto.randomUUID()}`, toolPath);
         core.debug(`Attempting to download ${ovrPlatformUtil} from ${url} to ${archiveDownloadPath}`);
         const archivePath = await tc.downloadTool(url, archiveDownloadPath);
         core.debug(`Successfully downloaded ${ovrPlatformUtil} to ${archivePath}`);
         if (IS_MAC || IS_LINUX) {
-            await exec.exec(`chmod +x ${archivePath}`);
+            await fs.promises.chmod(archivePath, 0o755);
         }
         const downloadVersion = await getVersion(archivePath);
         core.debug(`Setting tool cache: ${archivePath} | ${toolPath} | ${ovrPlatformUtil} | ${downloadVersion}`);
         toolDirectory = await tc.cacheFile(archivePath, toolPath, ovrPlatformUtil, downloadVersion);
+        await fs.promises.rm(path.dirname(archivePath), { recursive: true, force: true });
         tool = await getExecutable(toolDirectory);
     } else {
         tool = await getExecutable(toolDirectory);
@@ -58,6 +60,11 @@ async function setup_ovrPlatformUtil(): Promise<void> {
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`)
     core.addPath(toolDirectory);
+    const version = await getVersion(tool);
+    core.info(`OVR_PLATFORM_UTIL_PATH -> ${tool}`);
+    core.exportVariable('OVR_PLATFORM_UTIL_PATH', tool);
+    core.setOutput('path', tool);
+    core.setOutput('version', version);
     await exec.exec(ovrPlatformUtil, ['help']);
 }
 
