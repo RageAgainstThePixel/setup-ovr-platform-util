@@ -36435,6 +36435,32 @@ module.exports = {
 
 /***/ }),
 
+/***/ 1946:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ParseVersion = ParseVersion;
+const semver = __nccwpck_require__(1383);
+const versionRegEx = /(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?/;
+function ParseVersion(output) {
+    const match = output.match(versionRegEx);
+    if (!match) {
+        throw Error(`Failed to find a valid version match in:\n${output}`);
+    }
+    const [, major, minor, patch, build] = match;
+    const semVerStr = build ? `${major}.${minor}.${patch}+${build}` : `${major}.${minor}.${patch}`;
+    const version = semver.valid(semVerStr);
+    if (!version) {
+        throw Error(`Failed to find a valid version in: ${match[0]}`);
+    }
+    return semVerStr;
+}
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -36763,7 +36789,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tc = __nccwpck_require__(7784);
 const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
+const io = __nccwpck_require__(7436);
 const semver = __nccwpck_require__(1383);
+const version = __nccwpck_require__(1946);
 const path = __nccwpck_require__(1017);
 const fs = __nccwpck_require__(7147);
 const ovrPlatformUtil = 'ovr-platform-util';
@@ -36811,11 +36839,26 @@ async function setup_ovrPlatformUtil() {
         if (selfUpdate) {
             await exec.exec(tool, ['self-update']);
             await checkToolAccess(tool);
+            toolDirectory = await recacheIfUpdated(tool, toolDirectory);
+            tool = await getExecutable(toolDirectory);
         }
     }
     core.debug(`${ovrPlatformUtil} -> ${toolDirectory}`);
     core.addPath(toolDirectory);
     await exec.exec(ovrPlatformUtil, ['help']);
+}
+async function recacheIfUpdated(tool, toolDirectory) {
+    const versionDirectory = path.dirname(toolDirectory);
+    const cachedVersion = path.basename(versionDirectory);
+    const updatedVersion = await getVersion(tool);
+    if (semver.clean(updatedVersion) === cachedVersion) {
+        return toolDirectory;
+    }
+    core.info(`${ovrPlatformUtil} updated from ${cachedVersion} to ${updatedVersion}`);
+    const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedVersion);
+    await io.rmRF(versionDirectory);
+    await io.rmRF(`${versionDirectory}.complete`);
+    return updatedToolDirectory;
 }
 async function checkToolAccess(tool, retries = 5) {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -36824,6 +36867,9 @@ async function checkToolAccess(tool, retries = 5) {
     }
     catch (error) {
         if (error.code === 'EBUSY') {
+            if (retries <= 0) {
+                throw Error(`Failed to access ${tool}, it is still busy after self-update`);
+            }
             core.warning(`Failed to access ${tool}, retrying...`);
             await checkToolAccess(tool, retries - 1);
         }
@@ -36856,7 +36902,6 @@ async function getExecutable(directory) {
     return tool;
 }
 async function getVersion(tool) {
-    const semVerRegEx = new RegExp(/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)?/);
     let output = '';
     await exec.exec(tool, ['version'], {
         listeners: {
@@ -36865,17 +36910,7 @@ async function getVersion(tool) {
             }
         }
     });
-    const match = output.match(semVerRegEx)[0];
-    if (!match) {
-        throw Error("Failed to find a valid version match");
-    }
-    const lastPeriodIndex = match.lastIndexOf('.');
-    const semVerStr = match.substring(0, lastPeriodIndex) + '+' + match.substring(lastPeriodIndex + 1);
-    const version = semver.clean(semVerStr);
-    if (!version) {
-        throw Error("Failed to find a valid version");
-    }
-    return version;
+    return version.ParseVersion(output);
 }
 
 })();
