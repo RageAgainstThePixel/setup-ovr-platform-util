@@ -1,6 +1,6 @@
-# setup-ovr-platform-utility
+# setup-ovr-platform-util
 
-A GitHub Action to setup the [`ovr-platform-utility`](https://developer.oculus.com/resources/publish-reference-platform-command-line-utility) tool command alias.
+A GitHub Action to setup the [`ovr-platform-util`](https://developers.meta.com/horizon/resources/publish-reference-platform-command-line-utility/) tool command alias.
 
 ## How to use
 
@@ -22,7 +22,7 @@ jobs:
 
 | Name | Description | Required |
 | ---- | ----------- | -------- |
-| `self-update` | Automatically update the ovr-platform-util tool. | Defaults to `true`. |
+| `self-update` | Automatically update the ovr-platform-util tool when it is restored from the runner tool cache. A fresh download is already the latest version. Defaults to `true`. | false |
 
 ### outputs
 
