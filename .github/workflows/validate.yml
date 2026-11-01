@@ -12,7 +12,15 @@ concurrency:
   group: ${{ github.ref }}
 
 jobs:
+  changes:
+    permissions:
+      contents: read
+      pull-requests: read
+    # docs-only pull requests skip validation; validate-result still reports for them
+    uses: RageAgainstThePixel/workflows/.github/workflows/detect-changes.yml@main
   test:
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,6 +32,8 @@ jobs:
       - run: npm ci
       - run: npm test
   validate:
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -42,3 +52,23 @@ jobs:
           echo "version: ${{ steps.setup-ovr-platform-util.outputs.version }}"
           "$OVR_PLATFORM_UTIL_PATH" version
         shell: bash
+  # the one required check: passes when every job passed or was skipped for a docs-only change
+  validate-result:
+    needs: [changes, test, validate]
+    if: always()
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Check results
+        shell: bash
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "results: ${RESULTS}"
+          for result in ${RESULTS}; do
+            case "${result}" in
+              success|skipped) ;;
+              *) exit 1 ;;
+            esac
+          done
