@@ -1,4 +1,4 @@
-import semver = require('semver');
+import * as semver from 'semver';
 
 const versionRegEx = /(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?/;
 
