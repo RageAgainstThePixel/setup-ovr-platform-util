@@ -41,8 +41,5 @@
     "bundle": "ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "clean": "npm install && shx rm -rf dist/ out/ node_modules/ && npm ci",
     "test": "shx rm -rf out/ && tsc --ignoreConfig src/version.spec.ts --outDir out --module node16 --target es2020 --moduleResolution node16 --types node && node --test out/version.spec.js"
-  },
-  "overrides": {
-    "@actions/http-client": "^3.0.2"
   }
 }
