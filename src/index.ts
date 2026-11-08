@@ -82,8 +82,9 @@ async function recacheIfUpdated(tool: string, toolDirectory: string): Promise<st
     }
     core.info(`${ovrPlatformUtil} updated from ${cachedVersion} to ${updatedVersion}`);
     const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedCacheVersion);
-    await io.rmRF(versionDirectory);
-    await io.rmRF(`${versionDirectory}.complete`);
+    // only this architecture's entry, so another architecture cached under the same version keeps its copy
+    await io.rmRF(toolDirectory);
+    await io.rmRF(`${toolDirectory}.complete`);
     return updatedToolDirectory;
 }
 

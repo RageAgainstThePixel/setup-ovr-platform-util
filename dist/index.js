@@ -37541,8 +37541,8 @@ async function recacheIfUpdated(tool, toolDirectory) {
     }
     core.info(`${ovrPlatformUtil} updated from ${cachedVersion} to ${updatedVersion}`);
     const updatedToolDirectory = await tc.cacheFile(tool, toolPath, ovrPlatformUtil, updatedCacheVersion);
-    await io.rmRF(versionDirectory);
-    await io.rmRF(`${versionDirectory}.complete`);
+    await io.rmRF(toolDirectory);
+    await io.rmRF(`${toolDirectory}.complete`);
     return updatedToolDirectory;
 }
 async function checkToolAccess(tool, retries = 5) {
