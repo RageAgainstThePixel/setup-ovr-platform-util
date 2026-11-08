@@ -1,11 +1,11 @@
-import tc = require('@actions/tool-cache');
-import core = require('@actions/core');
-import exec = require('@actions/exec');
-import io = require('@actions/io');
-import version = require('./version');
-import path = require('path');
-import fs = require('fs');
-import crypto = require('crypto');
+import * as tc from '@actions/tool-cache';
+import * as core from '@actions/core';
+import * as exec from '@actions/exec';
+import * as io from '@actions/io';
+import * as version from './version';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 const ovrPlatformUtil = 'ovr-platform-util';
 const IS_WINDOWS = process.platform === 'win32'

@@ -1,6 +1,6 @@
-import test = require('node:test');
-import assert = require('node:assert');
-import version = require('./version');
+import { test } from 'node:test';
+import * as assert from 'node:assert';
+import * as version from './version';
 
 test('parses a 3 part version', () => {
     assert.strictEqual(version.ParseVersion('208.0.0\n'), '208.0.0');
